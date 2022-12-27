@@ -36,7 +36,6 @@ int read_processes(const char* filename, Process* processes) {
 		processes[num_processes].num_bursts = i;
 		num_processes++;
 	}
-
 	fclose(fp);
 	return num_processes;
 }
@@ -58,7 +57,6 @@ int main(int argc, char** argv) {
 	int current_process = 0;
 	while (current_process < num_processes) {
 		Process p = processes[current_process];
-
 		// If there is no current burst for the current process, move on to the next process.
 		if (p.num_bursts == 0) {
 			current_process++;
@@ -73,8 +71,7 @@ int main(int argc, char** argv) {
 			p.bursts[0][0]--;  // decrement the remaining CPU burst time
 			if (p.bursts[0][0] == 0) {
 				p.num_bursts--;  // remove the completed burst
-				memmove(p.bursts, p.bur
-						sts[1], p.num_bursts * sizeof(p.bursts[0]));
+				memmove(p.bursts, p.bursts[1], p.num_bursts * sizeof(p.bursts[0]));
 			}
 		} else {
 			// If there is no I/O burst, execute the CPU burst or run the IDLE process.
@@ -85,11 +82,17 @@ int main(int argc, char** argv) {
 				p.num_bursts--; // remove the completed burst
 				memmove(p.bursts, p.bursts[1], p.num_bursts * sizeof(p.bursts[0]));
 			} else {
+				// Run the IDLE process.
 				current_time++;
 				num_idle_executions++;
 			}
 		}
+
+
+		// Update the current process in the processes array.
+		processes[current_process] = p;
 	}
+
 	printf("Average turnaround time: %.2f\n", (float) total_turnaround_time / num_processes);
 	printf("Average waiting time: %.2f\n", (float) total_waiting_time / num_processes);
 	printf("Number of times IDLE process executed: %d\n", num_idle_executions);
